@@ -20,7 +20,6 @@ fn main() {
 					match tcp_stream.read(&mut buffer) {
 						Ok(0) => break,
 						Ok(_) => {
-							println!("read from stream: {}", String::from_utf8_lossy(&buffer));
 							tcp_stream.write(response.as_bytes()).expect("Failed to write to stream");
 						}
 						Err(e) => {
