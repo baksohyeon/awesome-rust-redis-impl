@@ -19,27 +19,38 @@ async fn main() {
 }
 
 pub async fn handle_connection_process(stream: TcpStream) {
-    println!("accepted new connection");
-    println!("{:?}", stream);
-    let mut tcp_stream = stream;
-    let response = "+PONG\r\n";
+  println!("accepted new connection");
+  println!("{:?}", stream);
+  let mut tcp_stream = stream;
 
     let mut buffer = [0; 1024];
 
-    loop {
-        match tcp_stream.read(&mut buffer) {
-            Ok(0) => break,
-            Ok(_) => {
-                tcp_stream
-                    .write_all(response.as_bytes())
-                    .expect("Failed to write to stream");
-            }
-            Err(e) => {
-                println!("multiple Ping response error: {}", e);
-                break;
-            }
-        }
-    }
+  loop {
+      match tcp_stream.read(&mut buffer) {
+          Ok(0) => break,
+          Ok(_) => {
+            let req = String::from_utf8_lossy(&buffer);
+            let res = process_request(&req);
+              tcp_stream
+                  .write_all(res.as_bytes())
+                  .expect("Failed to write to stream");
+          }
+          Err(e) => {
+              println!("multiple Ping response error: {}", e);
+              break;
+          }
+      }
+  }
 
     println!("read from stream: {}", String::from_utf8_lossy(&buffer));
+}
+
+
+fn process_request(request: &str) -> String {
+  let parts: Vec<&str> = request.split("\r\n").collect();
+  if parts.len() > 2 && parts[2] == "ECHO" {
+      let message = parts[4];
+      return format!("${}\r\n{}\r\n", message.len(), message)
+  }
+  "+PONG\r\n".to_string()
 }
