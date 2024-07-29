@@ -5,6 +5,7 @@ use std::{
     net::{TcpListener, TcpStream},
 };
 use tokio::sync::Mutex;
+use bytes::{BytesMut, BufMut};
 
 #[tokio::main]
 async fn main() {
@@ -25,9 +26,9 @@ pub async fn handle_connection_process(
     db: Arc<Mutex<HashMap<String, String>>>,
 ) {
     println!("accepted new connection");
-    let mut buffer = [0; 1024];
-
+    let mut buffer = BytesMut::with_capacity(1024);
     loop {
+        // tcp stream -> buffer -> parser -> value
         match stream.read(&mut buffer) {
             Ok(0) => break,
             Ok(_) => {
