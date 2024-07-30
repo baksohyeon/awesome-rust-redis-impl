@@ -38,6 +38,7 @@ enum RespValue {
     Array(Vec<RespValue>), // For Arrays the first byte of the reply is "*".
 }
 
+// refered source code: https://github.dev/iorust/resp/tree/master/src
 impl RespValue {
 
     /// Returns `true` if the value is a `Null` or `NullArray`. Returns `false` otherwise.
@@ -48,13 +49,28 @@ impl RespValue {
     /// assert_eq!(RespValue::NullArray.is_null(), true);
     /// assert_eq!(RespValue::Integer(123).is_null(), false);
     /// ```
-    fn is_null(&self) -> bool {
+    pub fn is_null(&self) -> bool {
         // TODO: self 와 *self 의 차이
         match *self { 
             RespValue::Null | RespValue::NullArray => true,
             _ => false
         }
     }
+
+    /// Returns `true` if the value is a `Error`. Returns `false` otherwise.
+    /// # Examples
+    /// ```
+    /// # use self::resp::{Value};
+    /// assert_eq!(Value::Null.is_error(), false);
+    /// assert_eq!(Value::Error("".to_string()).is_error(), true);
+    /// ```
+    pub fn is_error(&self) -> bool {
+        match *self {
+            RespValue::Error(_) => true,
+            _ => false
+        }
+    }
+
 }
 
 
