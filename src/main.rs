@@ -2,15 +2,24 @@ use std::sync::Arc;
 use std::{
     collections::HashMap,
     io::{Read, Write},
-    net::{TcpListener, TcpStream},
+    net::TcpStream,
 };
 use tokio::sync::Mutex;
+
+use crate::client::connection::{Connection, ConnectionImpl, RedisConfig};
+pub mod client;
 
 #[tokio::main]
 async fn main() {
     println!("Logs from your program will appear here!");
 
-    let listener = TcpListener::bind("127.0.0.1:6379").expect("Failed to bind to port 6379");
+    let connection = ConnectionImpl::new(RedisConfig {
+        host: "127.0.0.1".to_string(),
+        port: 6379,
+    });
+
+    let listener = connection.create_listener();
+
     let db = Arc::new(Mutex::new(HashMap::new()));
 
     loop {
@@ -49,8 +58,6 @@ pub async fn handle_connection_process(
 
 async fn process_request(request: &str, db: &Arc<Mutex<HashMap<String, String>>>) -> String {
     let parts: Vec<&str> = request.split("\r\n").collect();
-
-
 
     if parts.len() > 2 {
         match parts[2] {
