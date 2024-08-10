@@ -63,16 +63,16 @@ impl RespCodec {
             }
             b'*' => {
                 let mut buf = String::new();
-                let a = reader.read_line(&mut buf)?;
-                println!("decode: a: {:?}", a);
+                reader.read_line(&mut buf)?;
                 let len: i64 = buf.trim_end().parse().map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
-                println!("decode: len: {:?}", len);
+                // println!("decode: len: {:?}, buf: {:?}", len, buf);
                 if len == -1 {
                     return Ok(RespValue::NullArray);
                 }
                 let mut array = Vec::with_capacity(len as usize);
                 for _ in 0..len {
                     array.push(Self::decode(reader)?);
+                    println!("decode: resp-value array: {:?}", array);
                 }
 
                 Ok(RespValue::Array(array))

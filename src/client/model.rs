@@ -18,38 +18,38 @@ pub enum RespValue {
 
 
 
-impl RespValue {
+// impl RespValue {
 
-    /// Returns `true` if the value is a `Null` or `NullArray`. Returns `false` otherwise.
-    /// # Examples
-    /// ```
-    /// # use self::client::{RespValue};
-    /// assert_eq!(RespValue::Null.is_null(), true);
-    /// assert_eq!(RespValue::NullArray.is_null(), true);
-    /// assert_eq!(RespValue::Integer(123).is_null(), false);
-    /// ```
-    pub fn is_null(&self) -> bool {
-        match *self { 
-            RespValue::Null | RespValue::NullArray => true,
-            _ => false
-        }
-    }
+//     /// Returns `true` if the value is a `Null` or `NullArray`. Returns `false` otherwise.
+//     /// # Examples
+//     /// ```
+//     /// # use self::client::{RespValue};
+//     /// assert_eq!(RespValue::Null.is_null(), true);
+//     /// assert_eq!(RespValue::NullArray.is_null(), true);
+//     /// assert_eq!(RespValue::Integer(123).is_null(), false);
+//     /// ```
+//     pub fn is_null(&self) -> bool {
+//         match *self { 
+//             RespValue::Null | RespValue::NullArray => true,
+//             _ => false
+//         }
+//     }
 
-    /// Returns `true` if the value is a `Error`. Returns `false` otherwise.
-    /// # Examples
-    /// ```
-    /// # use self::client::{RespValue};
-    /// assert_eq!(RespValue::Null.is_error(), false);
-    /// assert_eq!(RespValue::Error("".to_string()).is_error(), true);
-    /// ```
-    pub fn is_error(&self) -> bool {
-        match *self {
-            RespValue::Error(_) => true,
-            _ => false
-        }
-    }
+//     /// Returns `true` if the value is a `Error`. Returns `false` otherwise.
+//     /// # Examples
+//     /// ```
+//     /// # use self::client::{RespValue};
+//     /// assert_eq!(RespValue::Null.is_error(), false);
+//     /// assert_eq!(RespValue::Error("".to_string()).is_error(), true);
+//     /// ```
+//     pub fn is_error(&self) -> bool {
+//         match *self {
+//             RespValue::Error(_) => true,
+//             _ => false
+//         }
+//     }
 
-    // pub fn to_binary_buffer(&self) -> Vec<u8>  {
-    //     encode(self)
-    // }
-}
+//     // pub fn to_binary_buffer(&self) -> Vec<u8>  {
+//     //     encode(self)
+//     // }
+// }
