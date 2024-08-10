@@ -1,25 +1,31 @@
-// use bytes::BufMut;
+use std::collections::HashMap;
+use std::time::{Duration, Instant};
 
-// pub struct ComposerImpl {
-    
-// }
-
-// pub trait Composer {
-//     fn end(&self, buf: BufMut) -> Result<(), Box<dyn Error>>;
-//     fn write_fn(&self, buf: BufMut) -> Result<(), Box<dyn Error>>;
-//     fn end_fn(&self, buf: BufMut) -> Result<(), Box<dyn Error>>;
-//     fn reset_fn(&self, buf: BufMut) -> Result<(), Box<dyn Error>>;
-// }
+pub struct DataStore {
+    data: HashMap<String, (String, Option<Instant>)>,
+}
 
 
-// impl Composer for ComposerImpl {
-//     fn new(write_fn: fn(buf: BufMut) -> Result<(), Box<dyn Error>>,
-//            end_fn: fn(buf: BufMut) -> Result<(), Box<dyn Error>>,
-//            reset_fn: fn(buf: BufMut) -> Result<(), Box<dyn Error>>) -> Self {
-//         Self { write_fn, end_fn, reset_fn }
-//     }
 
-//     fn end(&self, buf: BufMut) -> Result<(), Box<dyn Error>> {
-//         self.end_fn(buf)
-//     }
-// }
+impl DataStore {
+    pub fn new() -> Self {
+        DataStore {
+            data: HashMap::new(),
+        }
+    }
+
+    pub fn set(&mut self, key: String, value: String, expiry: Option<Duration>) {
+        let expires_at = expiry.map(|duration| Instant::now() + duration);
+        self.data.insert(key, (value, expires_at));
+    }
+
+    pub fn get(&self, key: &str) -> Option<String> {
+        self.data.get(key).and_then(|(value, expires_at)| {
+            match expires_at {
+                Some(expiry) if expiry > &Instant::now() => Some(value.clone()),
+                None => Some(value.clone()),
+                _ => None,
+            }
+        })
+    }
+}
