@@ -50,13 +50,21 @@ async fn handle_client(stream: TcpStream, data_store: Arc<Mutex<CacheStore>>) ->
                 let response = process_command(commands, &data_store);
                 // writer.write_all(&RespCodec::encode(&response))?;
                 redis_writer.write_all(&RespCodec::encode(&response))?;
-                // redis_writer.write_all(&RespCodec::encode(&response))?;
                 redis_writer.flush()?;
                 println!("handle_client: response: {:?} \n \n", response);
             }
-            Ok(_) => return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "Expected array")),
-            Err(e) if e.kind() == std::io::ErrorKind::UnexpectedEof => break,
-            Err(e) => return Err(e),
+            Ok(other) => {
+                eprintln!("handle_client: Unexpected data type: {:?}", other);
+                return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "Expected array"));
+            }
+            Err(e) if e.kind() == std::io::ErrorKind::UnexpectedEof => {
+                eprintln!("handle_client: Unexpected EOF: {}", e);
+                break;
+            }
+            Err(e) => {
+                eprintln!("handle_client: Error decoding command: {}", e);
+                return Err(e);
+            }
         }
     }
 
