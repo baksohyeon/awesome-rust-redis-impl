@@ -2,14 +2,14 @@ use std::net::{TcpListener, TcpStream};
 use std::io::{BufReader, BufWriter, Write};
 use std::sync::{Arc, Mutex};
 use tokio::task;
-use super::composer::DataStore;
+use super::cache_store::CacheStore;
 use super::codec::RespCodec;
 use super::model::RespValue;
 
 pub struct RedisServer {
     host: String,
     port: u16,
-    data_store: Arc<Mutex<DataStore>>,
+    data_store: Arc<Mutex<CacheStore>>,
 }
 
 impl RedisServer {
@@ -17,7 +17,7 @@ impl RedisServer {
         RedisServer {
             host,
             port,
-            data_store: Arc::new(Mutex::new(DataStore::new())),
+            data_store: Arc::new(Mutex::new(CacheStore::new())),
         }
     }
 
@@ -39,7 +39,7 @@ impl RedisServer {
 }
 
 
-async fn handle_client(stream: TcpStream, data_store: Arc<Mutex<DataStore>>) -> std::io::Result<()> {
+async fn handle_client(stream: TcpStream, data_store: Arc<Mutex<CacheStore>>) -> std::io::Result<()> {
     let mut redis_reader = BufReader::new(&stream);
     let mut redis_writer = BufWriter::new(&stream);
 
@@ -62,7 +62,7 @@ async fn handle_client(stream: TcpStream, data_store: Arc<Mutex<DataStore>>) -> 
 
     Ok(())
 }
-fn process_command(commands: Vec<RespValue>, data_store: &Arc<Mutex<DataStore>>) -> RespValue {
+fn process_command(commands: Vec<RespValue>, data_store: &Arc<Mutex<CacheStore>>) -> RespValue {
     if commands.is_empty() {
         return RespValue::Error("ERR no command specified".to_string());
     }

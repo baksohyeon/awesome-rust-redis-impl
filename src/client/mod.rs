@@ -1,4 +1,4 @@
 pub mod codec;
 pub mod connection;
-pub mod composer;
+pub mod cache_store;
 pub mod model;

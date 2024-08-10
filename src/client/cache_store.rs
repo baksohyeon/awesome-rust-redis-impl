@@ -2,15 +2,15 @@ use std::collections::HashMap;
 use std::time::{Duration, Instant};
 
 #[derive(Debug)]
-pub struct DataStore {
+pub struct CacheStore {
     data: HashMap<String, (String, Option<Instant>)>,
 }
 
 
 
-impl DataStore {
+impl CacheStore {
     pub fn new() -> Self {
-        DataStore {
+        CacheStore {
             data: HashMap::new(),
         }
     }
