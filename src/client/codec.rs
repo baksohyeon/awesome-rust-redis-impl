@@ -63,8 +63,10 @@ impl RespCodec {
             }
             b'*' => {
                 let mut buf = String::new();
-                reader.read_line(&mut buf)?;
+                let a = reader.read_line(&mut buf)?;
+                println!("decode: a: {:?}", a);
                 let len: i64 = buf.trim_end().parse().map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+                println!("decode: len: {:?}", len);
                 if len == -1 {
                     return Ok(RespValue::NullArray);
                 }
@@ -72,6 +74,7 @@ impl RespCodec {
                 for _ in 0..len {
                     array.push(Self::decode(reader)?);
                 }
+
                 Ok(RespValue::Array(array))
             }
             _ => Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid RESP data")),

@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
 
+#[derive(Debug)]
 pub struct DataStore {
     data: HashMap<String, (String, Option<Instant>)>,
 }
