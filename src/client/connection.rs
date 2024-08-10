@@ -59,8 +59,14 @@ async fn handle_client(stream: TcpStream, data_store: Arc<Mutex<DataStore>>) -> 
 }
 
 fn process_command(commands: Vec<RespValue>, data_store: &Arc<Mutex<DataStore>>) -> RespValue {
-    if let Some(RespValue::BulkString(command)) = commands.get(0) {
-        match command.to_uppercase().as_str() {
+    if let Some(command) = commands.get(0) {
+        let command_str = match command {
+            RespValue::BulkString(s) => s.as_str(),
+            RespValue::SimpleString(s) => s.as_str(),
+            _ => return RespValue::Error("ERR invalid command".to_string()),
+        };
+
+        match command_str.to_uppercase().as_str() {
             "PING" => RespValue::SimpleString("PONG".to_string()),
             "SET" => {
                 if let (Some(RespValue::BulkString(key)), Some(RespValue::BulkString(value))) = (commands.get(1), commands.get(2)) {
