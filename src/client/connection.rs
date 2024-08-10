@@ -38,13 +38,6 @@ impl RedisServer {
     }
 }
 
-// fn test_handle_client(stream: TcpStream, data_store: Arc<Mutex<DataStore>>) -> Result<(), std::io::Error> {
-//     let mut stream = stream;
-//     println!("{:?}", data_store);   
-//     let response = "+PONG\r\n";
-//     stream.write_all(response.as_bytes()).map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
-//     Ok(())
-// }
 
 async fn handle_client(stream: TcpStream, data_store: Arc<Mutex<DataStore>>) -> std::io::Result<()> {
     let mut redis_reader = BufReader::new(&stream);
