@@ -80,33 +80,33 @@ fn process_command(commands: Vec<RespValue>, data_store: &Arc<Mutex<CacheStore>>
         RespValue::BinaryBulkString(b) => {
             match String::from_utf8(b.clone()) {
                 Ok(s) => s.to_uppercase(),
-                Err(_) => return RespValue::Error("ERR invalid command".to_string()),
+                Err(_) => return RespValue::Error("ERR invalid command: non-UTF8 data".to_string()),
             }
         },
-        _ => return RespValue::Error("ERR invalid command".to_string()),
+        _ => return RespValue::Error("ERR invalid command: expected string".to_string()),
     };
 
     match command.as_str() {
         "PING" => RespValue::SimpleString("PONG".to_string()),
         "SET" => {
             if commands.len() < 3 {
-                return RespValue::Error("ERR wrong number of arguments for 'set' command".to_string());
+                return RespValue::Error("ERR wrong number of arguments for 'set' command: expected 3".to_string());
             }
             let key = match &commands[1] {
                 RespValue::BulkString(s) | RespValue::SimpleString(s) => s.clone(),
                 RespValue::BinaryBulkString(b) => match String::from_utf8(b.clone()) {
                     Ok(s) => s,
-                    Err(_) => return RespValue::Error("ERR invalid key".to_string()),
+                    Err(_) => return RespValue::Error("ERR invalid key: non-UTF8 data".to_string()),
                 },
-                _ => return RespValue::Error("ERR invalid key".to_string()),
+                _ => return RespValue::Error("ERR invalid key: expected string".to_string()),
             };
             let value = match &commands[2] {
                 RespValue::BulkString(s) | RespValue::SimpleString(s) => s.clone(),
                 RespValue::BinaryBulkString(b) => match String::from_utf8(b.clone()) {
                     Ok(s) => s,
-                    Err(_) => return RespValue::Error("ERR invalid value".to_string()),
+                    Err(_) => return RespValue::Error("ERR invalid value: non-UTF8 data".to_string()),
                 },
-                _ => return RespValue::Error("ERR invalid value".to_string()),
+                _ => return RespValue::Error("ERR invalid value: expected string".to_string()),
             };
             let mut store = data_store.lock().unwrap();
             store.set(key, value, None);
@@ -114,29 +114,28 @@ fn process_command(commands: Vec<RespValue>, data_store: &Arc<Mutex<CacheStore>>
         }
         "GET" => {
             if commands.len() < 2 {
-                return RespValue::Error("ERR wrong number of arguments for 'get' command".to_string());
+                return RespValue::Error("ERR wrong number of arguments for 'get' command: expected 2".to_string());
             }
             let key = match &commands[1] {
                 RespValue::BulkString(s) | RespValue::SimpleString(s) => s.clone(),
                 RespValue::BinaryBulkString(b) => match String::from_utf8(b.clone()) {
-                    
                     Ok(s) => s,
-                    Err(_) => return RespValue::Error("ERR invalid key".to_string()),
+                    Err(_) => return RespValue::Error("ERR invalid key: non-UTF8 data".to_string()),
                 },
-                _ => return RespValue::Error("ERR invalid key".to_string()),
+                _ => return RespValue::Error("ERR invalid key: expected string".to_string()),
             };
             let store = data_store.lock().unwrap();
             match store.get(&key) {
                 Some(value) => RespValue::BulkString(value),
-                None => RespValue::Null,
+                None => RespValue::Error("ERR key not found".to_string()),
             }
         }
         "ECHO" => {
             if commands.len() < 2 {
-                return RespValue::Error("ERR wrong number of arguments for 'echo' command".to_string());
+                return RespValue::Error("ERR wrong number of arguments for 'echo' command: expected 2".to_string());
             }
             commands[1].clone()
         }
-        _ => RespValue::Error("ERR unknown command".to_string()),
+        _ => RespValue::Error(format!("ERR unknown command: {}", command)),
     }
 }
