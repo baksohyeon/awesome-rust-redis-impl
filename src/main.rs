@@ -5,9 +5,14 @@ use std::{
     net::TcpStream,
 };
 use tokio::sync::Mutex;
-
-use crate::client::connection::{Connection, ConnectionImpl, RedisConfig};
+use std::io::{BufRead, BufReader};
+use crate::client::{
+    connection::{Connection, ConnectionImpl, RedisConfig},
+    codec::{Decoder},
+    model::{RespValue},
+};
 pub mod client;
+
 
 #[tokio::main]
 async fn main() {
@@ -35,6 +40,8 @@ pub async fn handle_connection_process(
 ) {
     println!("accepted new connection");
     let mut buffer = [0; 1024];
+
+    
 
     loop {
         match stream.read(&mut buffer) {

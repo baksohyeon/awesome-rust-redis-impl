@@ -17,6 +17,7 @@ pub struct ConnectionImpl {
     port: i16,
 }
 
+
 impl Connection for ConnectionImpl {
     fn new(options: RedisConfig) -> Self {
         Self {
@@ -35,7 +36,7 @@ impl Connection for ConnectionImpl {
         loop {
             let (socket, _) = listener.accept().expect("Failed to accept connection");
             println!("Connection accepted: {:?}", socket);
-            return socket;
+            break socket;
         }
     }
 }
